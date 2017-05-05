@@ -32,7 +32,7 @@ class TreeNode {
     }
 
     getParent() {
-
+        return this.parent;
     }
 }
 
@@ -73,19 +73,23 @@ module.exports = class BinaryTree {
                 node.parent.right = null;
             }
         } else if (node.hasTwoChilds()) {
-        
             // find the next nearest number from value
-            let currentNode = node.right, movedLeft = false;
+            let currentNode = node.right;
+            
             while(currentNode.left) {
                 currentNode = currentNode.left;
-                movedLeft = true;
             }
 
-            // after find it we remove this leaf to replace the deleted node
-            if (movedLeft)
-                currentNode.parent.left = null;
-            else
-                currentNode.parent.right = null;
+            // has right child or has no childs
+            if (!currentNode.hasTwoChilds()) {
+                if(value < currentNode.parent.getValue()) {
+                    currentNode.parent.left = null;
+                } else {
+                    currentNode.parent.right = null;
+                }
+            } else if(currentNode.hasOnlyRightChild()) {
+                currentNode.parent.right = currentNode.right;
+            }
 
             // replacing
             if ( value < node.parent.getValue()) {
@@ -97,20 +101,16 @@ module.exports = class BinaryTree {
             currentNode.left = node.left;
             currentNode.right = node.right;
 
-
-        } else if (node.hasOnlyLeftChild() || node.hasOnlyRightChild()) {
-            if ( value < node.parent.getValue()) {
-                node.parent.left = node.left;
-            } else {
-                node.parent.right = node.right;
-            }
+        } else if (node.hasOnlyLeftChild()) {
+            node.parent.left = node.left;
+        } else if (node.hasOnlyRightChild()) {
+            node.parent.right = node.right;
         }
     } 
 
     search(value, node) {
-
         if (!node) {
-            return -1;
+            return null;
         } else if (value == node.getValue()) {
             return node;
         } else if (value < node.getValue()) {
@@ -124,5 +124,14 @@ module.exports = class BinaryTree {
             else
                 return this.search(value, node.getRightNode());
         }
+    }
+
+    print (node) {
+        if(node != null) {
+            console.log(node);
+            this.print(node.left);    
+            this.print(node.right);
+        }
+
     }
 }
